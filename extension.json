@@ -1,0 +1,19 @@
+{
+  "title": "Language server (HTTP)",
+  "description": "Provides hovers, definitions, references, and implementations by communicating with an LSP-compliant language server over HTTP.",
+  "url": "http://localhost:1234/cx-langserver-http.js",
+  "activationEvents": ["*"],
+  "contributes": {
+    "configuration": {
+      "title": "Language server (HTTP) settings",
+      "properties": {
+        "languageServer.url": {
+          "description": "The URL to the HTTP(S) endpoint of the LSP gateway, which is expected to translate an HTTP POST with a JSON array body of multiple LSP requests to a JSON array of the corresponding responses.",
+          "type": "string",
+          "format": "uri",
+          "examples": ["https://sourcegraph.com/.api/xlang"]
+        }
+      }
+    }
+  }
+}
