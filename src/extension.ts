@@ -53,7 +53,6 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
         cxp.rawConnection.onRequest(method, async <P extends TextDocumentPositionParams>(params: P) => {
             const mode = uriToMode.get(params.textDocument.uri)
             if (!mode) {
-                console.log(Array.from(uriToMode.entries()))
                 throw new Error(
                     `error forwarding ${method} request for ${params.textDocument.uri}: unknown language ID`
                 )
@@ -73,14 +72,13 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
                 return null
             }
 
-            const results = await sendLSPRequest(
-                {
-                    url,
-                    mode,
-                    root,
-                },
-                { method, params }
-            )
+            const results = await sendLSPRequest({
+                url,
+                mode,
+                root,
+                method,
+                params,
+            })
             return results[1]
         })
     }

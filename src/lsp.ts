@@ -1,5 +1,4 @@
-import { ajax, AjaxResponse } from 'rxjs/ajax'
-import { catchError, map, tap } from 'rxjs/operators'
+import { memoizeAsync } from './util/memoizeAsync'
 
 interface LSPResponse {
     result: any
@@ -37,69 +36,56 @@ interface LSPRequest {
 /**
  * Sends an HTTP POST request with the given LSP request.
  */
-export async function sendLSPRequest(context: LSPContext, request?: LSPRequest): Promise<LSPResponse[]> {
-    return ajax({
-        method: 'POST',
-        url: `${context.url}/${request ? request.method : 'initialize'}`,
-        headers: {
-            'X-Requested-With': 'cx-langserver-http',
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-            [
-                {
-                    id: 0,
-                    method: 'initialize',
-                    params: {
-                        rootUri: context.root,
-                        mode: context.mode,
-                        initializationOptions: { mode: context.mode },
+export const sendLSPRequest = memoizeAsync(
+    (arg: LSPContext & LSPRequest): Promise<LSPResponse[]> =>
+        fetch(`${arg.url}/${arg.method || 'initialize'}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'cx-langserver-http',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            mode: 'cors',
+            body: JSON.stringify(
+                [
+                    {
+                        id: 0,
+                        method: 'initialize',
+                        params: {
+                            rootUri: arg.root,
+                            mode: arg.mode,
+                            initializationOptions: { mode: arg.mode },
+                        },
                     },
-                },
-                request ? { id: 1, ...request } : null,
-                { id: 2, method: 'shutdown' },
-                { method: 'exit' },
-            ].filter(m => m !== null)
-        ),
-    })
-        .pipe(
-            // Workaround for https://github.com/ReactiveX/rxjs/issues/3606
-            tap(response => {
-                if (response.status === 0) {
-                    throw Object.assign(new Error('Ajax status 0'), response)
+                    arg.method ? { id: 1, method: arg.method, params: arg.params } : null,
+                    { id: 2, method: 'shutdown' },
+                    { method: 'exit' },
+                ].filter(m => m !== null)
+            ),
+        })
+            .then(resp => {
+                if (resp.status !== 200) {
+                    if (resp.status === 0) {
+                        return Promise.reject(
+                            new Error(
+                                'Unable to reach server. Check your network connection and try again in a moment.'
+                            )
+                        )
+                    }
+                    return resp
+                        .text()
+                        .then(text => Promise.reject(new Error(`Unexpected HTTP error: ${resp.status} ${text}`)))
                 }
-            }),
-            catchError<AjaxResponse, never>(err => {
-                normalizeAjaxError(err)
-                throw err
-            }),
-            map(({ response }) => response),
-            map((responses: (LSPResponse | LSPError)[]) => {
+                return Promise.resolve(resp)
+            })
+            .then(resp => resp.json())
+            .then((responses: (LSPResponse | LSPError)[]) => {
                 for (const response of responses) {
                     if (response && 'error' in response) {
                         throw Object.assign(new Error(response.error.message), response.error, { responses })
                     }
                 }
-
                 return responses.map(result => result && (result as LSPResponse).result)
-            })
-        )
-        .toPromise()
-}
-
-function normalizeAjaxError(err: any): void {
-    if (!err) {
-        return
-    }
-    if (typeof err.status === 'number') {
-        if (err.status === 0) {
-            err.message = 'Unable to reach server. Check your network connection and try again in a moment.'
-        } else {
-            err.message = `Unexpected HTTP error: ${err.status}`
-            if (err.xhr && err.xhr.statusText) {
-                err.message += ` ${err.xhr.statusText}`
-            }
-        }
-    }
-}
+            }),
+    arg => JSON.stringify(arg) // not canonical, not perfect, but good enough
+)
