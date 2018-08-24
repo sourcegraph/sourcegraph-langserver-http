@@ -64,7 +64,7 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "cxp": "^11.2.0",
+    "cxp": "^11.3.0",
     "rxjs": "^6.2.2",
     "vscode-languageserver-types": "^3.10.1"
   }

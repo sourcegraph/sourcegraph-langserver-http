@@ -58,11 +58,10 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
                 )
             }
 
-            // HACK(sqs): Determining the HTTP endpoint URL from the origin only works in the Sourcegraph web app,
-            // not in the browser extension. Add a new client capability that exposes the Sourcegraph URL, or
-            // something similar.
             const url =
                 cxp.configuration.get('languageServer.url') ||
+                (cxp.initializeParams.capabilities.experimental &&
+                    cxp.initializeParams.capabilities.experimental.sourcegraphLanguageServerURL) ||
                 (/^https?:/.test(self.location.origin) ? `${self.location.origin}/.api/xlang` : undefined)
             if (!url) {
                 if (!loggedNoURL) {
