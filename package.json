@@ -1,6 +1,21 @@
 {
   "name": "cx-langserver-http",
-  "description": "A CXP extension that provides hovers, definitions, references, and implementations by communicating with an LSP-compliant language server over HTTP.",
+  "title": "Language server (HTTP)",
+  "description": "Provides hovers, definitions, references, and implementations by communicating with an LSP-compliant language server over HTTP.",
+  "activationEvents": ["*"],
+  "contributes": {
+    "configuration": {
+      "title": "Language server (HTTP) settings",
+      "properties": {
+        "languageServer.url": {
+          "description": "The URL to the HTTP(S) endpoint of the LSP gateway, which is expected to translate an HTTP POST with a JSON array body of multiple LSP requests to a JSON array of the corresponding responses.",
+          "type": "string",
+          "format": "uri",
+          "examples": ["https://sourcegraph.com/.api/xlang"]
+        }
+      }
+    }
+  },
   "version": "0.0.0-DEVELOPMENT",
   "license": "MIT",
   "repository": {
@@ -19,7 +34,8 @@
     "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha --require ts-node/register --require source-map-support/register --opts mocha.opts",
     "cover": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc --require ts-node/register --require source-map-support/register --all mocha --opts mocha.opts --timeout 10000",
     "build": "parcel build --no-minify --detailed-report --out-file cx-langserver-http.js src/extension.ts",
-    "serve": "parcel serve --no-hmr --no-source-maps --out-file cx-langserver-http.js src/extension.ts"
+    "serve": "parcel serve --no-hmr --no-source-maps --out-file cx-langserver-http.js src/extension.ts",
+    "sourcegraph:prepublish": "yarn run build"
   },
   "commitlint": {
     "extends": [
