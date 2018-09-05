@@ -1,8 +1,10 @@
 {
-  "name": "cx-langserver-http",
+  "name": "sourcegraph-langserver-http",
   "title": "Language server (HTTP)",
-  "description": "Provides hovers, definitions, references, and implementations by communicating with an LSP-compliant language server over HTTP.",
-  "activationEvents": ["*"],
+  "description": "A Sourcegraph extension that provides hovers, definitions, references, and implementations by communicating with an LSP-compliant language server over HTTP.",
+  "activationEvents": [
+    "*"
+  ],
   "contributes": {
     "configuration": {
       "title": "Language server (HTTP) settings",
@@ -11,7 +13,9 @@
           "description": "The URL to the HTTP(S) endpoint of the LSP gateway, which is expected to translate an HTTP POST with a JSON array body of multiple LSP requests to a JSON array of the corresponding responses.",
           "type": "string",
           "format": "uri",
-          "examples": ["https://sourcegraph.com/.api/xlang"]
+          "examples": [
+            "https://sourcegraph.com/.api/xlang"
+          ]
         }
       }
     }
@@ -20,12 +24,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sourcegraph/cx-langserver-http.git"
+    "url": "https://github.com/sourcegraph/sourcegraph-langserver-http.git"
   },
   "files": [
     "dist"
   ],
-  "main": "dist/cx-langserver-http.js",
+  "main": "dist/sourcegraph-langserver-http.js",
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "semantic-release": "semantic-release",
@@ -80,8 +84,8 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "cxp": "^11.3.0",
-    "rxjs": "^6.2.2",
+    "@sourcegraph/sourcegraph.proposed": "^12.0.1",
+    "rxjs": "^6.3.2",
     "vscode-languageserver-types": "^3.10.1"
   }
 }

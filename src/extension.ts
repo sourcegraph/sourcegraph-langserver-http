@@ -1,6 +1,5 @@
 import {
     activateExtension,
-    CXP,
     DefinitionRequest,
     DidOpenTextDocumentNotification,
     DidOpenTextDocumentParams,
@@ -10,10 +9,11 @@ import {
     Registration,
     RegistrationParams,
     RegistrationRequest,
+    SourcegraphExtensionAPI,
     TextDocumentPositionParams,
     TypeDefinitionRequest,
-} from 'cxp/module/extension'
-import { createWebWorkerMessageTransports } from 'cxp/module/jsonrpc2/transports/webWorker'
+} from '@sourcegraph/sourcegraph.proposed/module/extension'
+import { createWebWorkerMessageTransports } from '@sourcegraph/sourcegraph.proposed/module/jsonrpc2/transports/webWorker'
 import { sendLSPRequest } from './lsp'
 
 interface Settings {
@@ -22,9 +22,9 @@ interface Settings {
 
 let loggedNoURL = false
 
-/** Entrypoint for the Codecov CXP extension. */
-export async function run(cxp: CXP<Settings>): Promise<void> {
-    const root = cxp.root
+/** Entrypoint for the Codecov Sourcegraph extension. */
+export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promise<void> {
+    const root = sourcegraph.root
     if (!root) {
         return
     }
@@ -33,9 +33,12 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
     // forwarding requests for it.
     const uriToMode = new Map<string, string>()
     // HACK(sqs): This overrides the extension host's own handler for the same notification. Find a better way to do this.
-    cxp.rawConnection.onNotification(DidOpenTextDocumentNotification.type, (params: DidOpenTextDocumentParams) => {
-        uriToMode.set(params.textDocument.uri, params.textDocument.languageId)
-    })
+    sourcegraph.rawConnection.onNotification(
+        DidOpenTextDocumentNotification.type,
+        (params: DidOpenTextDocumentParams) => {
+            uriToMode.set(params.textDocument.uri, params.textDocument.languageId)
+        }
+    )
 
     // The LSP methods to forward.
     const methods: string[] = [
@@ -50,7 +53,7 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
         registrations.push({ id: method, method, registerOptions: { documentSelector: ['*'] } })
 
         // Respond to LSP requests for this method.
-        cxp.rawConnection.onRequest(method, async <P extends TextDocumentPositionParams>(params: P) => {
+        sourcegraph.rawConnection.onRequest(method, async <P extends TextDocumentPositionParams>(params: P) => {
             const mode = uriToMode.get(params.textDocument.uri)
             if (!mode) {
                 throw new Error(
@@ -59,9 +62,9 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
             }
 
             const url =
-                cxp.configuration.get('languageServer.url') ||
-                (cxp.initializeParams.capabilities.experimental &&
-                    cxp.initializeParams.capabilities.experimental.sourcegraphLanguageServerURL) ||
+                sourcegraph.configuration.get('languageServer.url') ||
+                (sourcegraph.initializeParams.capabilities.experimental &&
+                    sourcegraph.initializeParams.capabilities.experimental.sourcegraphLanguageServerURL) ||
                 (/^https?:/.test(self.location.origin) ? `${self.location.origin}/.api/xlang` : undefined)
             if (!url) {
                 if (!loggedNoURL) {
@@ -83,7 +86,7 @@ export async function run(cxp: CXP<Settings>): Promise<void> {
     }
 
     // Tell the client that we provide these LSP features.
-    await cxp.rawConnection.sendRequest(RegistrationRequest.type, { registrations } as RegistrationParams)
+    await sourcegraph.rawConnection.sendRequest(RegistrationRequest.type, { registrations } as RegistrationParams)
 }
 
 // This runs in a Web Worker and communicates using postMessage with the page.
