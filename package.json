@@ -86,6 +86,6 @@
   "dependencies": {
     "@sourcegraph/sourcegraph.proposed": "^12.0.1",
     "rxjs": "^6.3.2",
-    "vscode-languageserver-types": "^3.10.1"
+    "vscode-languageserver-types": "^3.12.0"
   }
 }
