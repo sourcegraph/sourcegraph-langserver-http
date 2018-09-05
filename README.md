@@ -1,9 +1,9 @@
-# cx-langserver-http (WIP)
+# sourcegraph-langserver-http
 
-[![npm](https://img.shields.io/npm/v/cx-langserver-http.svg)](https://www.npmjs.com/package/cx-langserver-http)
-[![downloads](https://img.shields.io/npm/dt/cx-langserver-http.svg)](https://www.npmjs.com/package/cx-langserver-http)
-[![build](https://travis-ci.org/sourcegraph/cx-langserver-http.svg?branch=master)](https://travis-ci.org/sourcegraph/cx-langserver-http)
-[![codecov](https://codecov.io/gh/sourcegraph/cx-langserver-http/branch/master/graph/badge.svg?token=c3KpMf1MaY)](https://codecov.io/gh/sourcegraph/cx-langserver-http)
+[![npm](https://img.shields.io/npm/v/sourcegraph-langserver-http.svg)](https://www.npmjs.com/package/sourcegraph-langserver-http)
+[![downloads](https://img.shields.io/npm/dt/sourcegraph-langserver-http.svg)](https://www.npmjs.com/package/sourcegraph-langserver-http)
+[![build](https://travis-ci.org/sourcegraph/sourcegraph-langserver-http.svg?branch=master)](https://travis-ci.org/sourcegraph/sourcegraph-langserver-http)
+[![codecov](https://codecov.io/gh/sourcegraph/sourcegraph-langserver-http/branch/master/graph/badge.svg?token=c3KpMf1MaY)](https://codecov.io/gh/sourcegraph/sourcegraph-langserver-http)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
@@ -17,6 +17,22 @@ This extension is enabled by default for all users on Sourcegraph.com. To use it
 
 ## Development
 
-This extension is different from other Sourcegraph extensions in that it is (typically) not published directly. Instead, its bundled JavaScript file is used by every `langserver/*` extension (which, in turn, are synthesized on-the-fly from the [Sourcegraph `langservers` site config option](https://about.sourcegraph.com/docs/config/site/#langservers-array)). Use the `cx-publish.bash` script in the internal Sourcegraph repository to publish a new version.
+Run `src extensions publish` (using the [`src` CLI](https://github.com/sourcegraph/src-cli)) to publish this extension for local development purposes. You will need to add `"publisher": "alice"` (replacing `alice` with your username) to `package.json`; see [src-cli #13](https://github.com/sourcegraph/src-cli/issues/13).
 
-If you publish this as its own extension (e.g., for local dev), use `"activationEvents": ["onLanguage:foo"]` (where `foo` is some language ID) to ensure it's only activated for files of a specific language and not all files.
+In development, it may be helpful to modify this extension's `package.json` file to contain `"activationEvents": ["onLanguage:foo"]` (where `foo` is some language ID). This causes it to only be activated for files of a specific language (not all files). The `"activationEvents": ["*"]` in the committed `package.json` will cause it to be used for all files, even files that are not code files.
+
+## Release and publishing
+
+This extension is different from other Sourcegraph extensions in that it is not published directly, for backcompat with language server site configuration in Sourcegraph. In the Sourcegraph backend, a `langserver/*` extension is synthesized for each element in the the [Sourcegraph `langservers` site config field](https://about.sourcegraph.com/docs/config/site/#langservers-array). This synthesized extension refers to the hard-coded JavaScript extension bundle URL https://storage.googleapis.com/sourcegraph-cx-dev/cx-langserver-http.js.
+
+To release a new version (which will immediately be used by all Sourcegraph instances), you need to bundle and upload that file. To do so, run:
+
+```bash
+npm install
+npm run build
+# Replace path/to/infrastructure with the path to your local checkout of the Sourcegraph internal
+# infrastructure repository.
+path/to/infrastructure/cmd/publish-sourcegraph-extension.bash dist/cx-langserver-http.{js,map}
+```
+
+To change the extension manifest for the synthesized `langserver/*` extensions, edit the `extensions_backcompat.go` file in `sourcegraph/sourcegraph`.

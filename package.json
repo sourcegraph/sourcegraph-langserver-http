@@ -29,7 +29,7 @@
   "files": [
     "dist"
   ],
-  "main": "dist/sourcegraph-langserver-http.js",
+  "main": "dist/cx-langserver-http.js",
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "semantic-release": "semantic-release",
