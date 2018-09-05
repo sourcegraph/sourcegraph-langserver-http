@@ -14,6 +14,7 @@ import {
     TypeDefinitionRequest,
 } from '@sourcegraph/sourcegraph.proposed/module/extension'
 import { createWebWorkerMessageTransports } from '@sourcegraph/sourcegraph.proposed/module/jsonrpc2/transports/webWorker'
+import { Hover } from 'vscode-languageserver-types'
 import { sendLSPRequest } from './lsp'
 
 interface Settings {
@@ -21,6 +22,30 @@ interface Settings {
 }
 
 let loggedNoURL = false
+
+/**
+ * Fixes a response to textDocument/hover that is invalid because either
+ * `range` or `contents` are `null`.
+ *
+ * See the spec:
+ *
+ * https://microsoft.github.io/language-server-protocol/specification#textDocument_hover
+ *
+ * @param response The LSP response to fix (will be mutated)
+ */
+const normalizeHoverResponse = (hoverResult: any): void => {
+    // rls for Rust sometimes responds with `range: null`.
+    // https://github.com/sourcegraph/sourcegraph/issues/11880
+    if (hoverResult && !hoverResult.range) {
+        hoverResult.range = undefined
+    }
+
+    // clangd for C/C++ sometimes responds with `contents: null`.
+    // https://github.com/sourcegraph/sourcegraph/issues/11880#issuecomment-396650342
+    if (hoverResult && !hoverResult.contents) {
+        hoverResult.contents = []
+    }
+}
 
 /** Entrypoint for the Codecov Sourcegraph extension. */
 export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promise<void> {
@@ -81,6 +106,16 @@ export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promi
                 method,
                 params,
             })
+
+            if (method === 'textDocument/hover') {
+                const hover = results[1].result as Hover
+                normalizeHoverResponse(hover)
+                // Do some shallow validation on response
+                if (hover !== null && !Hover.is(hover)) {
+                    throw Object.assign(new Error('Invalid hover response from language server'), { hover })
+                }
+            }
+
             return results[1]
         })
     }
