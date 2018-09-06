@@ -1,7 +1,5 @@
 # sourcegraph-langserver-http
 
-[![npm](https://img.shields.io/npm/v/sourcegraph-langserver-http.svg)](https://www.npmjs.com/package/sourcegraph-langserver-http)
-[![downloads](https://img.shields.io/npm/dt/sourcegraph-langserver-http.svg)](https://www.npmjs.com/package/sourcegraph-langserver-http)
 [![build](https://travis-ci.org/sourcegraph/sourcegraph-langserver-http.svg?branch=master)](https://travis-ci.org/sourcegraph/sourcegraph-langserver-http)
 [![codecov](https://codecov.io/gh/sourcegraph/sourcegraph-langserver-http/branch/master/graph/badge.svg?token=c3KpMf1MaY)](https://codecov.io/gh/sourcegraph/sourcegraph-langserver-http)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
