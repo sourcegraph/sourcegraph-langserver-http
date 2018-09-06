@@ -17,14 +17,8 @@ jobs:
         - npm run cover
         - nyc report --reporter json
         - 'bash <(curl -s https://codecov.io/bash)'
-    - stage: release
-      script:
-        - npm run build
-        - npm run semantic-release
 stages:
   - test
-  - name: release
-    if: branch = master AND type = push AND fork = false
 branches:
   only:
     - master

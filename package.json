@@ -32,7 +32,6 @@
   "main": "dist/sourcegraph-langserver-http.js",
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS",
-    "semantic-release": "semantic-release",
     "prettier": "prettier '**/{*.{js?(on),ts?(x),scss},.*.js?(on)}' --write --list-different",
     "tslint": "tslint -c tslint.json -p tsconfig.json './src/*.ts?(x)' './*.ts?(x)'",
     "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha --require ts-node/register --require source-map-support/register --opts mocha.opts",
@@ -77,7 +76,6 @@
     "nyc": "^12.0.2",
     "parcel-bundler": "^1.9.7",
     "prettier": "^1.14.2",
-    "semantic-release": "^15.9.9",
     "source-map-support": "^0.5.9",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",

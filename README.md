@@ -5,7 +5,6 @@
 [![build](https://travis-ci.org/sourcegraph/sourcegraph-langserver-http.svg?branch=master)](https://travis-ci.org/sourcegraph/sourcegraph-langserver-http)
 [![codecov](https://codecov.io/gh/sourcegraph/sourcegraph-langserver-http/branch/master/graph/badge.svg?token=c3KpMf1MaY)](https://codecov.io/gh/sourcegraph/sourcegraph-langserver-http)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 A [Sourcegraph extension](https://github.com/sourcegraph/sourcegraph-extension-api) that provides hovers, definitions, references, and implementations by communicating with an LSP-compliant language server over HTTP.
 
