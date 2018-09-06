@@ -86,7 +86,7 @@ export const sendLSPRequest = memoizeAsync(
                         throw Object.assign(new Error(response.error.message), response.error, { responses })
                     }
                 }
-                return responses.map(result => result && (result as LSPResponse).result)
+                return responses.map(result => result && (result as LSPResponse))
             }),
     arg => JSON.stringify(arg) // not canonical, not perfect, but good enough
 )

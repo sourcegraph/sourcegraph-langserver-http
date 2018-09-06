@@ -116,7 +116,7 @@ export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promi
                 }
             }
 
-            return results[1]
+            return results[1].result
         })
     }
 
