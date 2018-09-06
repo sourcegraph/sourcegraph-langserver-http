@@ -23,7 +23,7 @@ In development, it may be helpful to modify this extension's `package.json` file
 
 ## Release and publishing
 
-This extension is different from other Sourcegraph extensions in that it is not published directly, for backcompat with language server site configuration in Sourcegraph. In the Sourcegraph backend, a `langserver/*` extension is synthesized for each element in the the [Sourcegraph `langservers` site config field](https://about.sourcegraph.com/docs/config/site/#langservers-array). This synthesized extension refers to the hard-coded JavaScript extension bundle URL https://storage.googleapis.com/sourcegraph-cx-dev/cx-langserver-http.js.
+This extension is different from other Sourcegraph extensions in that it is not published directly, for backcompat with language server site configuration in Sourcegraph. In the Sourcegraph backend, a `langserver/*` extension is synthesized for each element in the the [Sourcegraph `langservers` site config field](https://about.sourcegraph.com/docs/config/site/#langservers-array). This synthesized extension refers to the hard-coded JavaScript extension bundle URL https://storage.googleapis.com/sourcegraph-cx-dev/sourcegraph-langserver-http.js.
 
 To release a new version (which will immediately be used by all Sourcegraph instances), you need to bundle and upload that file. To do so, run:
 
@@ -32,7 +32,7 @@ npm install
 npm run build
 # Replace path/to/infrastructure with the path to your local checkout of the Sourcegraph internal
 # infrastructure repository.
-path/to/infrastructure/cmd/publish-sourcegraph-extension.bash dist/cx-langserver-http.{js,map}
+path/to/infrastructure/cmd/publish-sourcegraph-extension.bash dist/sourcegraph-langserver-http.{js,map}
 ```
 
 To change the extension manifest for the synthesized `langserver/*` extensions, edit the `extensions_backcompat.go` file in `sourcegraph/sourcegraph`.
