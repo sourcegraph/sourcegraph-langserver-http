@@ -12,10 +12,11 @@ import {
     SourcegraphExtensionAPI,
     TextDocumentPositionParams,
     TypeDefinitionRequest,
-} from '@sourcegraph/sourcegraph.proposed/module/extension'
-import { createWebWorkerMessageTransports } from '@sourcegraph/sourcegraph.proposed/module/jsonrpc2/transports/webWorker'
+} from 'sourcegraph'
+import { createWebWorkerMessageTransports } from 'sourcegraph/module/jsonrpc2/transports/webWorker'
 import { Hover } from 'vscode-languageserver-types'
 import { sendLSPRequest } from './lsp'
+import { getModeFromPath } from './temporaryModes'
 
 interface Settings {
     ['languageServer.url']: string
@@ -49,11 +50,6 @@ const normalizeHoverResponse = (hoverResult: any): void => {
 
 /** Entrypoint for the Codecov Sourcegraph extension. */
 export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promise<void> {
-    const root = sourcegraph.root
-    if (!root) {
-        return
-    }
-
     // Track the language ID (== mode ID) of each opened file, so we know which language server mode ID to use when
     // forwarding requests for it.
     const uriToMode = new Map<string, string>()
@@ -64,6 +60,16 @@ export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promi
             uriToMode.set(params.textDocument.uri, params.textDocument.languageId)
         }
     )
+
+    // HACK(sqs): Temporary hack because the first document opened's didOpen notif doesn't get received by our
+    // handler above (it is registered too late).
+    const getModeForResource = (uri: string): string => {
+        const mode = uriToMode.get(uri)
+        if (mode) {
+            return mode
+        }
+        return getModeFromPath(uri) || 'plaintext'
+    }
 
     // The LSP methods to forward.
     const methods: string[] = [
@@ -79,7 +85,7 @@ export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promi
 
         // Respond to LSP requests for this method.
         sourcegraph.rawConnection.onRequest(method, async <P extends TextDocumentPositionParams>(params: P) => {
-            const mode = uriToMode.get(params.textDocument.uri)
+            const mode = getModeForResource(params.textDocument.uri)
             if (!mode) {
                 throw new Error(
                     `error forwarding ${method} request for ${params.textDocument.uri}: unknown language ID`
@@ -98,6 +104,8 @@ export async function run(sourcegraph: SourcegraphExtensionAPI<Settings>): Promi
                 }
                 return null
             }
+
+            const root = params.textDocument.uri.replace(/#.*$/, '') // remove everything after the '#'
 
             const results = await sendLSPRequest({
                 url,

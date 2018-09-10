@@ -29,15 +29,15 @@
   "files": [
     "dist"
   ],
-  "main": "dist/sourcegraph-langserver-http.js",
+  "main": "dist/extension.js",
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "prettier": "prettier '**/{*.{js?(on),ts?(x),scss},.*.js?(on)}' --write --list-different",
     "tslint": "tslint -c tslint.json -p tsconfig.json './src/*.ts?(x)' './*.ts?(x)'",
     "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha --require ts-node/register --require source-map-support/register --opts mocha.opts",
     "cover": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc --require ts-node/register --require source-map-support/register --all mocha --opts mocha.opts --timeout 10000",
-    "build": "parcel build --no-minify --detailed-report --out-file sourcegraph-langserver-http.js src/extension.ts",
-    "serve": "parcel serve --no-hmr --no-source-maps --out-file sourcegraph-langserver-http.js src/extension.ts",
+    "build": "parcel build --no-minify --detailed-report --out-file extension.js src/extension.ts",
+    "serve": "parcel serve --no-hmr --no-source-maps --out-file extension.js src/extension.ts",
     "sourcegraph:prepublish": "yarn run build"
   },
   "commitlint": {
@@ -82,8 +82,8 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "@sourcegraph/sourcegraph.proposed": "^12.0.1",
     "rxjs": "^6.3.2",
+    "sourcegraph": "^14.1.1",
     "vscode-languageserver-types": "^3.12.0"
   }
 }
