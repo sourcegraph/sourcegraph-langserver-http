@@ -27,9 +27,12 @@ To release a new version (which will immediately be used by all Sourcegraph inst
 ```bash
 npm install
 npm run build
+
+cp dist/extension.js dist/sourcegraph-langserver-http.js
+
 # Replace path/to/infrastructure with the path to your local checkout of the Sourcegraph internal
 # infrastructure repository.
-path/to/infrastructure/cmd/publish-sourcegraph-extension.bash dist/sourcegraph-langserver-http.{js,map}
+path/to/infrastructure/cmd/publish-sourcegraph-extension.bash dist/sourcegraph-langserver-http.js
 ```
 
 To change the extension manifest for the synthesized `langserver/*` extensions, edit the `extensions_backcompat.go` file in `sourcegraph/sourcegraph`.
