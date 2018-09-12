@@ -1,3 +1,4 @@
+import * as sourcegraph from 'sourcegraph'
 import { memoizeAsync } from './util/memoizeAsync'
 
 interface LSPResponse {
@@ -10,9 +11,6 @@ interface LSPError {
 
 /** The context of an LSP request. */
 interface LSPContext {
-    /** The URL of the HTTP endpoint. */
-    url: string
-
     /** The root URI (LSP `rootUri`)/ */
     root: string
 
@@ -38,16 +36,9 @@ interface LSPRequest {
  */
 export const sendLSPRequest = memoizeAsync(
     (arg: LSPContext & LSPRequest): Promise<LSPResponse[]> =>
-        fetch(`${arg.url}/${arg.method || 'initialize'}`, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'cx-langserver-http',
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            mode: 'cors',
-            body: JSON.stringify(
+        sourcegraph.commands
+            .executeCommand<(LSPResponse | LSPError)[]>(
+                'queryLSP',
                 [
                     {
                         id: 0,
@@ -62,25 +53,8 @@ export const sendLSPRequest = memoizeAsync(
                     { id: 2, method: 'shutdown' },
                     { method: 'exit' },
                 ].filter(m => m !== null)
-            ),
-        })
-            .then(resp => {
-                if (resp.status !== 200) {
-                    if (resp.status === 0) {
-                        return Promise.reject(
-                            new Error(
-                                'Unable to reach server. Check your network connection and try again in a moment.'
-                            )
-                        )
-                    }
-                    return resp
-                        .text()
-                        .then(text => Promise.reject(new Error(`Unexpected HTTP error: ${resp.status} ${text}`)))
-                }
-                return Promise.resolve(resp)
-            })
-            .then(resp => resp.json())
-            .then((responses: (LSPResponse | LSPError)[]) => {
+            )
+            .then(responses => {
                 for (const response of responses) {
                     if (response && 'error' in response) {
                         throw Object.assign(new Error(response.error.message), response.error, { responses })

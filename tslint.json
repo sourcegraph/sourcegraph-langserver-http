@@ -1,6 +1,3 @@
 {
-  "extends": ["@sourcegraph/tslint-config"],
-  "rules": {
-    "rxjs-no-wholesale": false
-  }
+  "extends": ["@sourcegraph/tslint-config"]
 }

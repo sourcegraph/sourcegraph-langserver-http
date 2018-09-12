@@ -5,21 +5,6 @@
   "activationEvents": [
     "*"
   ],
-  "contributes": {
-    "configuration": {
-      "title": "Language server (HTTP) settings",
-      "properties": {
-        "languageServer.url": {
-          "description": "The URL to the HTTP(S) endpoint of the LSP gateway, which is expected to translate an HTTP POST with a JSON array body of multiple LSP requests to a JSON array of the corresponding responses.",
-          "type": "string",
-          "format": "uri",
-          "examples": [
-            "https://sourcegraph.com/.api/xlang"
-          ]
-        }
-      }
-    }
-  },
   "version": "0.0.0-DEVELOPMENT",
   "license": "MIT",
   "repository": {
@@ -59,12 +44,11 @@
     "husky": "^0.14.3",
     "parcel-bundler": "^1.9.7",
     "prettier": "^1.14.2",
+    "sourcegraph": "^17.1.0",
     "tslint": "^5.11.0",
     "typescript": "^3.0.1"
   },
   "dependencies": {
-    "rxjs": "^6.3.2",
-    "sourcegraph": "^14.1.1",
     "vscode-languageserver-types": "^3.12.0"
   }
 }
