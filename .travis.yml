@@ -13,10 +13,6 @@ jobs:
         - npm run prettier
         - npm run tslint
         - npm run build
-        - npm test
-        - npm run cover
-        - nyc report --reporter json
-        - 'bash <(curl -s https://codecov.io/bash)'
 stages:
   - test
 branches:
