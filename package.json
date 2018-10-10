@@ -5,6 +5,25 @@
   "activationEvents": [
     "*"
   ],
+  "contributes": {
+    "actions": [
+      {
+        "id": "langserver.status",
+        "actionItem": {
+          "description": "${get(context, `langserver.statusDescription`)}",
+          "iconURL": "${get(context, `langserver.statusIconURL`)}"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "action": "langserver.status",
+          "when": "resource"
+        }
+      ]
+    }
+  },
   "version": "0.0.0-DEVELOPMENT",
   "license": "MIT",
   "repository": {
