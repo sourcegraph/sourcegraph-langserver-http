@@ -16,6 +16,9 @@ interface LSPContext {
 
     /** The mode identifier for the language server to communicate with. */
     mode: string
+
+    /** The initializationOptions that are passed in the initialize request. */
+    initializationOptions: any
 }
 
 /** An LSP request. */
@@ -46,7 +49,7 @@ export const sendLSPRequest = memoizeAsync(
                         params: {
                             rootUri: arg.root,
                             mode: arg.mode,
-                            initializationOptions: { mode: arg.mode },
+                            initializationOptions: arg.initializationOptions,
                         },
                     },
                     arg.method ? { id: 1, method: arg.method, params: arg.params } : null,
