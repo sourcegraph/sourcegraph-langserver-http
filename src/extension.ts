@@ -4,6 +4,19 @@ import { sendLSPRequest } from './lsp'
 
 /** Entrypoint for the language server HTTP adapter Sourcegraph extension. */
 export function activate(): void {
+    activateWith({ provideLSPResults })
+}
+
+export function activateWith({
+    provideLSPResults,
+}: {
+    provideLSPResults: (
+        method: string,
+        doc: sourcegraph.TextDocument,
+        pos: sourcegraph.Position,
+        initializationOptions?: any
+    ) => Promise<any>
+}): void {
     sourcegraph.languages.registerHoverProvider(['*'], {
         provideHover: async (doc, pos) => {
             const result = await provideLSPResults('textDocument/hover', doc, pos)
@@ -24,10 +37,11 @@ export function activate(): void {
     })
 }
 
-async function provideLSPResults(
+export async function provideLSPResults(
     method: string,
     doc: sourcegraph.TextDocument,
-    pos: sourcegraph.Position
+    pos: sourcegraph.Position,
+    initializationOptions?: any
 ): Promise<any> {
     const root = doc.uri.replace(/#.*$/, '') // remove everything after the '#'
     try {
@@ -36,6 +50,7 @@ async function provideLSPResults(
             root,
             method,
             params: { textDocument: { uri: doc.uri }, position: { line: pos.line, character: pos.character } },
+            initializationOptions: { ...(initializationOptions || {}), mode: doc.languageId },
         })
         return results[1].result
     } catch (err) {
