@@ -36,7 +36,7 @@ cp dist/extension.js dist/sourcegraph-langserver-http.<VERSION>.js
 path/to/infrastructure/cmd/publish-sourcegraph-extension.bash dist/sourcegraph-langserver-http.<VERSION>.js
 
 # This file is no longer needed.
-rm dist/sourcegraph-langserver-http.3.js
+rm dist/sourcegraph-langserver-http.<VERSION>.js
 ```
 
 To change the extension manifest for the synthesized `langserver/*` extensions, edit the `extensions_backcompat.go` file in `sourcegraph/sourcegraph`.
